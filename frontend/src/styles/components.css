@@ -1,0 +1,304 @@
+/* components.css - Composants réutilisables */
+
+/* ===== PHOTO COLLAGE BACKGROUND ===== */
+.photo-collage {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.collage-item {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 30px;
+  overflow: hidden;
+  opacity: 0.15;
+  filter: blur(2px) grayscale(0.3);
+  transition: all 0.5s var(--ease);
+  animation: floatFloral 15s ease-in-out infinite;
+}
+
+.collage-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===== GALLERY CARD ===== */
+.gallery-card {
+  position: absolute;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 280px;
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(12px);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: var(--sh-md);
+  animation: slideInRight 0.8s var(--ease) both;
+  z-index: 5;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  aspect-ratio: 1;
+  cursor: pointer;
+  transition: all 0.4s var(--ease);
+  animation: galleryAppear 0.6s var(--ease) both;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease);
+}
+
+.gallery-item:hover {
+  transform: scale(1.05);
+  box-shadow: var(--sh-rose);
+  z-index: 10;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.15);
+}
+
+.gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(232,100,138,0.4), transparent);
+  display: flex;
+  align-items: flex-end;
+  padding: 10px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.gallery-item:hover .gallery-overlay {
+  opacity: 1;
+}
+
+/* ===== CAROUSEL ===== */
+.inspiration-carousel {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  padding: 20px 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 20px;
+  animation: scroll 30s linear infinite;
+  width: fit-content;
+}
+
+.carousel-track:hover {
+  animation-play-state: paused;
+}
+
+.carousel-item {
+  flex: 0 0 200px;
+  height: 120px;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  position: relative;
+  box-shadow: var(--sh-md);
+  transition: all 0.4s var(--ease);
+  pointer-events: auto;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s;
+}
+
+.carousel-item span {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: white;
+  font-size: 14px;
+  transform: translateY(100%);
+  transition: transform 0.3s var(--ease);
+}
+
+.carousel-item:hover {
+  transform: scale(1.1) rotate(2deg);
+  z-index: 10;
+  box-shadow: var(--sh-rose);
+}
+
+.carousel-item:hover img {
+  transform: scale(1.2);
+}
+
+.carousel-item:hover span {
+  transform: translateY(0);
+}
+
+/* ===== FLIP CARD ===== */
+.flip-card {
+  width: 200px;
+  height: 200px;
+  perspective: 2000px;
+  cursor: pointer;
+  position: absolute;
+  top: 30%;
+  left: 5%;
+  z-index: 15;
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s var(--ease);
+  transform-style: preserve-3d;
+}
+
+.flip-card.flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-front, .flip-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--sh-md);
+}
+
+.flip-front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.flip-back {
+  background: linear-gradient(135deg, var(--rose), var(--gold));
+  color: white;
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* ===== PHOTO UPLOAD ===== */
+.photo-upload-group {
+  margin-bottom: 20px;
+}
+
+.photo-upload {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.photo-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--rose);
+  box-shadow: var(--sh-rose);
+  position: relative;
+  animation: pulseGlow 3s infinite;
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.photo-preview:hover img {
+  transform: scale(1.1);
+}
+
+.upload-zone {
+  flex: 1;
+  padding: 20px;
+  border: 2px dashed var(--rose-light);
+  border-radius: var(--r-md);
+  background: rgba(232,100,138,0.03);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-zone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, var(--rose-mist), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.upload-zone:hover {
+  border-color: var(--rose);
+  background: rgba(232,100,138,0.08);
+  transform: translateY(-2px);
+}
+
+.upload-zone:hover::before {
+  opacity: 0.5;
+  animation: ripple 1s ease-out;
+}
+
+/* ===== PARTICLES ===== */
+.particle {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  background: var(--rose);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  filter: blur(1px);
+}
+
+/* ===== LOADING SPINNER ===== */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}

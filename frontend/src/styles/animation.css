@@ -1,0 +1,49 @@
+/* animations.css - Toutes les animations supplémentaires */
+
+/* Floating animations */
+@keyframes floatFloral {
+  0%,100% { transform: translate(0,0) rotate(0deg); }
+  25% { transform: translate(15px,-20px) rotate(5deg); }
+  50% { transform: translate(-10px,15px) rotate(-3deg); }
+  75% { transform: translate(8px,8px) rotate(2deg); }
+}
+
+@keyframes particleFall {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 0.5; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-100% - 20px)); }
+}
+
+@keyframes pulseGlow {
+  0%,100% { box-shadow: 0 0 0 0 var(--rose-mist); }
+  50% { box-shadow: 0 0 0 10px transparent; }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translate(50px, -50%); }
+  to { opacity: 1; transform: translateY(-50%); }
+}
+
+@keyframes galleryAppear {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Grain effect */
+@keyframes grainShift {
+  to { transform: translate(4px,-6px); }
+}
