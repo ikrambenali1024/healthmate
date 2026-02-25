@@ -3,9 +3,12 @@ import { useState } from "react";
 import "../styles/auth.css";
 import "../styles/animation.css";
 import "../styles/components.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Ajoute useNavigate
+import axios from "axios";
 
 function Register() {
+  const navigate = useNavigate(); // Pour rediriger après inscription
+  
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -23,6 +26,7 @@ function Register() {
   const [passwordStrength, setPasswordStrength] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(""); // Message de succès
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,8 +43,6 @@ function Register() {
     else setPasswordStrength('strong');
   };
 
-  
-
   const createParticles = () => {
     for (let i = 0; i < 20; i++) {
       const particle = document.createElement('div');
@@ -52,23 +54,65 @@ function Register() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
     
+    // Validation côté client
     if (formData.password !== formData.confirmPassword) {
       setError("Les mots de passe ne correspondent pas");
       setLoading(false);
       return;
     }
 
-    // Simulation d'inscription
-    setTimeout(() => {
-      console.log("Inscription réussie", formData);
-      setLoading(false);
+    // Préparer les données pour le backend
+    const userData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      password: formData.password,
+      birthDate: formData.birthDate,
+      gender: formData.gender,
+      height: formData.height ? parseFloat(formData.height) : null,
+      weight: formData.weight ? parseFloat(formData.weight) : null,
+      goal: formData.goal
+    };
+
+    try {
+      // 🔥 ENVOI VERS LE BACKEND
+      const response = await axios.post('http://localhost:5000/api/auth/register', userData);
+      
+      console.log("Réponse du serveur:", response.data);
+      
+      // Succès !
+      setSuccess("Inscription réussie ! Redirection vers la connexion...");
       createParticles(); // Effet de célébration
-    }, 2000);
+      
+      // Rediriger vers login après 2 secondes
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+      
+    } catch (err) {
+      console.error("Erreur d'inscription:", err);
+      
+      // Gestion des erreurs
+      if (err.response) {
+        // Le serveur a répondu avec une erreur
+        setError(err.response.data.message || "Une erreur est survenue");
+      } else if (err.request) {
+        // La requête a été faite mais pas de réponse
+        setError("Impossible de contacter le serveur. Vérifie ta connexion.");
+      } else {
+        // Autre erreur
+        setError("Une erreur inattendue s'est produite");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Créer un tableau dupliqué pour l'effet infini
@@ -102,22 +146,23 @@ function Register() {
       <div className="blob blob-c"></div>
       <div className="blob blob-d"></div>
 
-      {/* Main Auth Box (plus large pour register) */}
+      {/* Main Auth Box */}
       <div className="auth-box register-box">
-        {/* NOUVEAU LOGO - COEUR */}
-       {/* Logo Coeur - Version Rose */}
-<div className="auth-logo">
-  <div className="auth-logo-icon" style={{ background: 'linear-gradient(135deg, #E8648A, #C44B72)' }}>
-    <svg viewBox="0 0 24 24" width="28" height="28">
-      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/>
-    </svg>
-  </div>
-  <span className="auth-logo-name">HealthMate</span>
-</div>
+        {/* Logo Rose */}
+        <div className="auth-logo">
+          <div className="auth-logo-icon" style={{ background: 'linear-gradient(135deg, #E8648A, #C44B72)' }}>
+            <svg viewBox="0 0 24 24" width="28" height="28">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/>
+            </svg>
+          </div>
+          <span className="auth-logo-name">HealthMate</span>
+        </div>
 
         <h2>Créer ton <em>compte</em></h2>
         <p className="auth-subtitle">Rejoins la communauté HealthMate 🌿</p>
 
+        {/* Message de succès */}
+        {success && <div className="success-message">{success}</div>}
 
         {/* Register Form */}
         <form onSubmit={handleSubmit}>
@@ -312,9 +357,7 @@ function Register() {
         </div>
       </div>
 
-      
-
-      {/* Bottom Carousel - INFINI (seule modification) */}
+      {/* Bottom Carousel */}
       <div className="inspiration-carousel">
         <div className="carousel-track">
           {carouselItems.map((item, i) => (

@@ -71,9 +71,9 @@ function Home() {
           </h1>
           
           <div className="hero-decoration">
-            <span className="decoration-leaf">🌿</span>
-            <span className="decoration-leaf">🌸</span>
-            <span className="decoration-leaf">🌱</span>
+            <span className="decoration-leaf"></span>
+            <span className="decoration-leaf"></span>
+            <span className="decoration-leaf"></span>
           </div>
 
           <p className="home-subtitle" style={{ color: '#000000' }}>
