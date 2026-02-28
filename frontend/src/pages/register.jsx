@@ -1,13 +1,13 @@
-// pages/register.jsx
+
 import { useState } from "react";
 import "../styles/auth.css";
 import "../styles/animation.css";
 import "../styles/components.css";
-import { Link, useNavigate } from "react-router-dom"; // Ajoute useNavigate
+import { Link, useNavigate } from "react-router-dom"; 
 import axios from "axios";
 
 function Register() {
-  const navigate = useNavigate(); // Pour rediriger après inscription
+  const navigate = useNavigate(); 
   
   const [formData, setFormData] = useState({
     firstName: "",
@@ -26,7 +26,7 @@ function Register() {
   const [passwordStrength, setPasswordStrength] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(""); // Message de succès
+  const [success, setSuccess] = useState(""); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,67 +55,63 @@ function Register() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccess("");
-    
-    // Validation côté client
-    if (formData.password !== formData.confirmPassword) {
-      setError("Les mots de passe ne correspondent pas");
-      setLoading(false);
-      return;
-    }
+  e.preventDefault();
+  setLoading(true);
+  setError("");
+  setSuccess("");
 
-    // Préparer les données pour le backend
-    const userData = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phone: formData.phone,
-      password: formData.password,
-      birthDate: formData.birthDate,
-      gender: formData.gender,
-      height: formData.height ? parseFloat(formData.height) : null,
-      weight: formData.weight ? parseFloat(formData.weight) : null,
-      goal: formData.goal
-    };
+  if (formData.password !== formData.confirmPassword) {
+    setError("Les mots de passe ne correspondent pas");
+    setLoading(false);
+    return;
+  }
 
-    try {
-      // 🔥 ENVOI VERS LE BACKEND
-      const response = await axios.post('http://localhost:5000/api/auth/register', userData);
-      
-      console.log("Réponse du serveur:", response.data);
-      
-      // Succès !
-      setSuccess("Inscription réussie ! Redirection vers la connexion...");
-      createParticles(); // Effet de célébration
-      
-      // Rediriger vers login après 2 secondes
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
-      
-    } catch (err) {
-      console.error("Erreur d'inscription:", err);
-      
-      // Gestion des erreurs
-      if (err.response) {
-        // Le serveur a répondu avec une erreur
-        setError(err.response.data.message || "Une erreur est survenue");
-      } else if (err.request) {
-        // La requête a été faite mais pas de réponse
-        setError("Impossible de contacter le serveur. Vérifie ta connexion.");
-      } else {
-        // Autre erreur
-        setError("Une erreur inattendue s'est produite");
-      }
-    } finally {
-      setLoading(false);
-    }
+  const userData = {
+    firstName: formData.firstName,
+    lastName: formData.lastName,
+    email: formData.email,
+    phone: formData.phone,
+    password: formData.password,
+    birthDate: formData.birthDate,
+    gender: formData.gender,
+    height: formData.height ? parseFloat(formData.height) : null,
+    weight: formData.weight ? parseFloat(formData.weight) : null,
+    goal: formData.goal
   };
 
-  // Créer un tableau dupliqué pour l'effet infini
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/api/auth/register",
+      userData
+    );
+
+    console.log("Réponse du serveur:", response.data);
+
+    setSuccess("Inscription réussie ! Redirection vers la connexion...");
+
+    // 🎉 Effet de célébration
+    createParticles();
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 2000);
+
+  } catch (err) {
+    console.error("Erreur d'inscription:", err);
+
+    if (err.response) {
+      setError(err.response.data.message || "Une erreur est survenue");
+    } else if (err.request) {
+      setError("Impossible de contacter le serveur. Vérifie ta connexion.");
+    } else {
+      setError("Une erreur inattendue s'est produite");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
+  
   const carouselItems = [
     'Bien-être', 'Méditation', 'Santé', 'sport', 'Nutrition', 'Forme',
     'Bien-être', 'Méditation', 'Santé', 'sport', 'Nutrition', 'Forme',
@@ -124,7 +120,7 @@ function Register() {
 
   return (
     <div className="auth-container">
-      {/* Background Photo Collage */}
+      {}
       <div className="photo-collage">
         <div className="collage-item" style={{ left: '8%', top: '12%', transform: 'rotate(-5deg)' }}>
           <img src="/assets/images/register-bg-1.jpg" alt="" />
@@ -137,18 +133,18 @@ function Register() {
         </div>
       </div>
 
-      {/* Grain Overlay */}
+      {}
       <div className="grain"></div>
 
-      {/* Floating Blobs */}
+      {}
       <div className="blob blob-a"></div>
       <div className="blob blob-b"></div>
       <div className="blob blob-c"></div>
       <div className="blob blob-d"></div>
 
-      {/* Main Auth Box */}
+      {}
       <div className="auth-box register-box">
-        {/* Logo Rose */}
+        {}
         <div className="auth-logo">
           <div className="auth-logo-icon" style={{ background: 'linear-gradient(135deg, #E8648A, #C44B72)' }}>
             <svg viewBox="0 0 24 24" width="28" height="28">
@@ -161,10 +157,10 @@ function Register() {
         <h2>Créer ton <em>compte</em></h2>
         <p className="auth-subtitle">Rejoins la communauté HealthMate 🌿</p>
 
-        {/* Message de succès */}
+        {}
         {success && <div className="success-message">{success}</div>}
 
-        {/* Register Form */}
+        {}
         <form onSubmit={handleSubmit}>
           <div className="register-grid">
             <div className="form-group">
@@ -174,7 +170,7 @@ function Register() {
                 <input
                   type="text"
                   name="firstName"
-                  placeholder="Jean"
+                  placeholder="Nom"
                   value={formData.firstName}
                   onChange={handleChange}
                   required
@@ -189,7 +185,7 @@ function Register() {
                 <input
                   type="text"
                   name="lastName"
-                  placeholder="Dupont"
+                  placeholder="Prénom"
                   value={formData.lastName}
                   onChange={handleChange}
                   required
@@ -205,7 +201,7 @@ function Register() {
               <input
                 type="email"
                 name="email"
-                placeholder="jean@email.com"
+                placeholder="nom@email.com"
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -220,7 +216,7 @@ function Register() {
               <input
                 type="tel"
                 name="phone"
-                placeholder="06 12 34 56 78"
+                placeholder="+216"
                 value={formData.phone}
                 onChange={handleChange}
               />
@@ -357,7 +353,7 @@ function Register() {
         </div>
       </div>
 
-      {/* Bottom Carousel */}
+      {}
       <div className="inspiration-carousel">
         <div className="carousel-track">
           {carouselItems.map((item, i) => (
