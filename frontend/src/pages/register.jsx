@@ -3,11 +3,6 @@ import { useState } from "react";
 import "../styles/auth.css";
 import "../styles/animation.css";
 import "../styles/components.css";
-<<<<<<< Updated upstream
-import { Link } from "react-router-dom";
-
-function Register() {
-=======
 
 import { Link, useNavigate } from "react-router-dom"; 
 import axios from "axios";
@@ -15,7 +10,6 @@ import axios from "axios";
 function Register() {
   const navigate = useNavigate(); 
   
->>>>>>> Stashed changes
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -33,10 +27,7 @@ function Register() {
   const [passwordStrength, setPasswordStrength] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-<<<<<<< Updated upstream
-=======
   const [success, setSuccess] = useState(""); 
->>>>>>> Stashed changes
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,69 +57,62 @@ function Register() {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    
-    if (formData.password !== formData.confirmPassword) {
-      setError("Les mots de passe ne correspondent pas");
-      setLoading(false);
-      return;
-    }
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError("");
+  setSuccess("");
 
-<<<<<<< Updated upstream
-    // Simulation d'inscription
-    setTimeout(() => {
-      console.log("Inscription réussie", formData);
-=======
-    const userData = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phone: formData.phone,
-      password: formData.password,
-      birthDate: formData.birthDate,
-      gender: formData.gender,
-      height: formData.height ? parseFloat(formData.height) : null,
-      weight: formData.weight ? parseFloat(formData.weight) : null,
-      goal: formData.goal
-    };
+  if (formData.password !== formData.confirmPassword) {
+    setError("Les mots de passe ne correspondent pas");
+    setLoading(false);
+    return;
+  }
 
-    try {
-  
-      const response = await axios.post('http://localhost:5000/api/auth/register', userData);
-      
-      console.log("Réponse du serveur:", response.data);
-      
-  
-      setSuccess("Inscription réussie ! Redirection vers la connexion...");
-      createParticles();
-      
-     
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
-      
-    } catch (err) {
-      console.error("Erreur d'inscription:", err);
-      
-      if (err.response) {
-      
-        setError(err.response.data.message || "Une erreur est survenue");
-      } else if (err.request) {
-       
-        setError("Impossible de contacter le serveur. Vérifie ta connexion.");
-      } else {
-       
-        setError("Une erreur inattendue s'est produite");
-      }
-    } finally {
->>>>>>> Stashed changes
-      setLoading(false);
-      createParticles(); // Effet de célébration
-    }, 2000);
+  const userData = {
+    firstName: formData.firstName,
+    lastName: formData.lastName,
+    email: formData.email,
+    phone: formData.phone,
+    password: formData.password,
+    birthDate: formData.birthDate,
+    gender: formData.gender,
+    height: formData.height ? parseFloat(formData.height) : null,
+    weight: formData.weight ? parseFloat(formData.weight) : null,
+    goal: formData.goal
   };
+
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/api/auth/register",
+      userData
+    );
+
+    console.log("Réponse du serveur:", response.data);
+
+    setSuccess("Inscription réussie ! Redirection vers la connexion...");
+
+    // 🎉 Effet de célébration
+    createParticles();
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 2000);
+
+  } catch (err) {
+    console.error("Erreur d'inscription:", err);
+
+    if (err.response) {
+      setError(err.response.data.message || "Une erreur est survenue");
+    } else if (err.request) {
+      setError("Impossible de contacter le serveur. Vérifie ta connexion.");
+    } else {
+      setError("Une erreur inattendue s'est produite");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   
   const carouselItems = [
@@ -161,20 +145,6 @@ function Register() {
       <div className="blob blob-c"></div>
       <div className="blob blob-d"></div>
 
-<<<<<<< Updated upstream
-      {/* Main Auth Box (plus large pour register) */}
-      <div className="auth-box register-box">
-        {/* NOUVEAU LOGO - COEUR */}
-       {/* Logo Coeur - Version Rose */}
-<div className="auth-logo">
-  <div className="auth-logo-icon" style={{ background: 'linear-gradient(135deg, #E8648A, #C44B72)' }}>
-    <svg viewBox="0 0 24 24" width="28" height="28">
-      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="white"/>
-    </svg>
-  </div>
-  <span className="auth-logo-name">HealthMate</span>
-</div>
-=======
       {}
       <div className="auth-box register-box">
         {}
@@ -186,16 +156,12 @@ function Register() {
           </div>
           <span className="auth-logo-name">HealthMate</span>
         </div>
->>>>>>> Stashed changes
 
         <h2>Créer ton <em>compte</em></h2>
         <p className="auth-subtitle">Rejoins la communauté HealthMate 🌿</p>
 
-<<<<<<< Updated upstream
-=======
         {}
         {success && <div className="success-message">{success}</div>}
->>>>>>> Stashed changes
 
         {}
         <form onSubmit={handleSubmit}>
@@ -390,13 +356,7 @@ function Register() {
         </div>
       </div>
 
-<<<<<<< Updated upstream
-      
-
-      {/* Bottom Carousel - INFINI (seule modification) */}
-=======
       {}
->>>>>>> Stashed changes
       <div className="inspiration-carousel">
         <div className="carousel-track">
           {carouselItems.map((item, i) => (
