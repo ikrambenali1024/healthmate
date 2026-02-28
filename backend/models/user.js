@@ -8,22 +8,14 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, required: true },
     password: { type: String, required: true },
     birthDate: { type: Date, required: true },
-<<<<<<< HEAD
-    gender: { type: String, required: true, enum: ["Homme", "Femme"] },
-=======
     gender: { type: String, required: true, enum: ["male", "female","Homme", "Femme"] },
->>>>>>> frontend-auth
     height: { type: Number, required: true },
     weight: { type: Number, required: true },
     goal: { type: String, required: true },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
 
-<<<<<<< HEAD
-    // ✅ Pour la vérification email
-=======
     // ✅ Pour la vérification email 
->>>>>>> frontend-auth
     isVerified: { type: Boolean, default: false },
     verificationToken: { type: String },
 
@@ -33,9 +25,4 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-<<<<<<< HEAD
-
 module.exports = mongoose.model("User", userSchema);
-=======
-module.exports = mongoose.model("User", userSchema);
->>>>>>> frontend-auth
