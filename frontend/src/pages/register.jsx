@@ -1,4 +1,4 @@
-
+// pages/register.jsx
 import { useState } from "react";
 import "../styles/auth.css";
 import "../styles/animation.css";
@@ -27,6 +27,10 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(""); 
+  
+  // 👁️ États pour afficher/masquer les mots de passe
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -120,7 +124,6 @@ function Register() {
 
   return (
     <div className="auth-container">
-      {}
       <div className="photo-collage">
         <div className="collage-item" style={{ left: '8%', top: '12%', transform: 'rotate(-5deg)' }}>
           <img src="/assets/images/register-bg-1.jpg" alt="" />
@@ -133,18 +136,14 @@ function Register() {
         </div>
       </div>
 
-      {}
       <div className="grain"></div>
 
-      {}
       <div className="blob blob-a"></div>
       <div className="blob blob-b"></div>
       <div className="blob blob-c"></div>
       <div className="blob blob-d"></div>
 
-      {}
       <div className="auth-box register-box">
-        {}
         <div className="auth-logo">
           <div className="auth-logo-icon" style={{ background: 'linear-gradient(135deg, #E8648A, #C44B72)' }}>
             <svg viewBox="0 0 24 24" width="28" height="28">
@@ -157,10 +156,8 @@ function Register() {
         <h2>Créer ton <em>compte</em></h2>
         <p className="auth-subtitle">Rejoins la communauté HealthMate 🌿</p>
 
-        {}
         {success && <div className="success-message">{success}</div>}
 
-        {}
         <form onSubmit={handleSubmit}>
           <div className="register-grid">
             <div className="form-group">
@@ -226,16 +223,37 @@ function Register() {
           <div className="register-grid">
             <div className="form-group">
               <label>Mot de passe</label>
-              <div className="input-wrapper">
+              <div className="input-wrapper" style={{ position: 'relative' }}>
                 <span className="input-icon">🔒</span>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
                   required
+                  style={{ paddingRight: '40px' }}
                 />
+                {/* 👁️ Icône œil */}
+                <span 
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    fontSize: '20px',
+                    userSelect: 'none',
+                    opacity: 0.6,
+                    transition: 'opacity 0.2s',
+                    zIndex: 2
+                  }}
+                  onMouseEnter={(e) => e.target.style.opacity = 1}
+                  onMouseLeave={(e) => e.target.style.opacity = 0.6}
+                >
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </span>
               </div>
               <div className="password-strength">
                 <div className={`strength-bar ${passwordStrength}`}></div>
@@ -244,16 +262,37 @@ function Register() {
 
             <div className="form-group">
               <label>Confirmer</label>
-              <div className="input-wrapper">
+              <div className="input-wrapper" style={{ position: 'relative' }}>
                 <span className="input-icon">🔒</span>
                 <input
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
                   placeholder="••••••••"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
+                  style={{ paddingRight: '40px' }}
                 />
+                {/* 👁️ Icône œil pour confirmation */}
+                <span 
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    fontSize: '20px',
+                    userSelect: 'none',
+                    opacity: 0.6,
+                    transition: 'opacity 0.2s',
+                    zIndex: 2
+                  }}
+                  onMouseEnter={(e) => e.target.style.opacity = 1}
+                  onMouseLeave={(e) => e.target.style.opacity = 0.6}
+                >
+                  {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                </span>
               </div>
             </div>
           </div>
@@ -353,7 +392,6 @@ function Register() {
         </div>
       </div>
 
-      {}
       <div className="inspiration-carousel">
         <div className="carousel-track">
           {carouselItems.map((item, i) => (

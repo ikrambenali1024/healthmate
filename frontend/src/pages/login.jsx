@@ -3,19 +3,22 @@ import { useState, useEffect } from "react";
 import "../styles/auth.css";
 import "../styles/animation.css";
 import "../styles/components.css";
-import { Link, useNavigate } from "react-router-dom"; // ← Ajoute useNavigate
-import axios from "axios"; // ← Ajoute axios
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Login() {
-  const navigate = useNavigate(); // ← Pour la redirection
+  const navigate = useNavigate();
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(""); // ← Ajouté
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const [attempts, setAttempts] = useState(0); // ← Pour suivre les tentatives
+  const [attempts, setAttempts] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
+  // 👁️ État pour afficher/masquer le mot de passe
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -25,21 +28,19 @@ function Login() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const handleSubmit = async (e) => { // ← async
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setSuccess("");
     
     try {
-      // Validation simple
       if (!email || !password) {
         setError("Veuillez remplir tous les champs");
         setLoading(false);
         return;
       }
 
-      // 🔥 Appel API vers le backend
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         email,
         password
@@ -47,7 +48,6 @@ function Login() {
 
       console.log("✅ Réponse du serveur:", response.data);
 
-      // Stocker le token et les infos utilisateur
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -55,7 +55,6 @@ function Login() {
 
       setSuccess("Connexion réussie ! Redirection...");
       
-      // Rediriger vers la page d'accueil après 1.5 secondes
       setTimeout(() => {
         navigate('/');
       }, 1500);
@@ -63,7 +62,6 @@ function Login() {
     } catch (err) {
       console.error("❌ Erreur de connexion:", err);
       
-      // Gestion des erreurs selon le code status
       if (err.response) {
         const status = err.response.status;
         const message = err.response.data.message;
@@ -89,7 +87,6 @@ function Login() {
             setError(message || "Erreur de connexion");
         }
 
-        // Gérer les tentatives
         if (message.includes("Tentative")) {
           const match = message.match(/(\d+)\/3/);
           if (match) {
@@ -97,7 +94,6 @@ function Login() {
           }
         }
       } else if (err.request) {
-        // Pas de réponse du serveur
         setError("Impossible de contacter le serveur. Vérifie ta connexion.");
       } else {
         setError("Une erreur inattendue s'est produite");
@@ -107,7 +103,6 @@ function Login() {
     }
   };
 
-  // Créer un tableau dupliqué pour l'effet infini
   const carouselItems = [
     'Bien-être', 'Méditation', 'Santé', 'sport', 'Nutrition', 'Forme',
     'Bien-être', 'Méditation', 'Santé', 'sport', 'Nutrition', 'Forme',
@@ -218,7 +213,7 @@ function Login() {
           <span className="divider-line"></span>
         </div>
 
-        {/* Login Form */}
+        {/* Login Form avec ŒIL */}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Email</label>
@@ -238,17 +233,40 @@ function Login() {
 
           <div className="form-group">
             <label>Mot de passe</label>
-            <div className="input-wrapper">
+            <div className="input-wrapper" style={{ position: 'relative' }}>
               <span className="input-icon">🔒</span>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
-                style={{ opacity: loading ? 0.7 : 1 }}
+                style={{ 
+                  opacity: loading ? 0.7 : 1,
+                  paddingRight: '40px'
+                }}
               />
+              {/* 👁️ Icône œil */}
+              <span 
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  cursor: 'pointer',
+                  fontSize: '20px',
+                  userSelect: 'none',
+                  opacity: 0.6,
+                  transition: 'opacity 0.2s',
+                  zIndex: 2
+                }}
+                onMouseEnter={(e) => e.target.style.opacity = 1}
+                onMouseLeave={(e) => e.target.style.opacity = 0.6}
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </span>
             </div>
           </div>
 

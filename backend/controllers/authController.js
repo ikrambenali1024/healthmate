@@ -255,8 +255,7 @@ const forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
     await user.save();
 
-    const resetLink = `${process.env.BACKEND_URL}/api/auth/reset-password/${resetToken}`;
-
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
     const mailOptions = {
       from: `"HealthMate 💚" <${process.env.EMAIL_USER}>`,
       to: user.email,
