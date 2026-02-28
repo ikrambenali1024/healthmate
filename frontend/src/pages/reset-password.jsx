@@ -17,6 +17,10 @@ function ResetPassword() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
+  // 👁️ États pour afficher/masquer les mots de passe
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -184,21 +188,44 @@ function ResetPassword() {
           <span className="divider-line"></span>
         </div>
 
-        {/* Formulaire */}
+        {/* Formulaire avec ŒILS */}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Nouveau mot de passe</label>
-            <div className="input-wrapper">
+            <div className="input-wrapper" style={{ position: 'relative' }}>
               <span className="input-icon">🔒</span>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={newPassword}
                 onChange={handlePasswordChange}
                 required
                 disabled={loading}
-                style={{ opacity: loading ? 0.7 : 1 }}
+                style={{ 
+                  opacity: loading ? 0.7 : 1,
+                  paddingRight: '40px'
+                }}
               />
+              {/* 👁️ Icône œil */}
+              <span 
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  cursor: 'pointer',
+                  fontSize: '20px',
+                  userSelect: 'none',
+                  opacity: 0.6,
+                  transition: 'opacity 0.2s',
+                  zIndex: 2
+                }}
+                onMouseEnter={(e) => e.target.style.opacity = 1}
+                onMouseLeave={(e) => e.target.style.opacity = 0.6}
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </span>
             </div>
             {/* Barre de force du mot de passe */}
             <div className="password-strength">
@@ -208,17 +235,40 @@ function ResetPassword() {
 
           <div className="form-group">
             <label>Confirmer le mot de passe</label>
-            <div className="input-wrapper">
+            <div className="input-wrapper" style={{ position: 'relative' }}>
               <span className="input-icon">🔒</span>
               <input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 disabled={loading}
-                style={{ opacity: loading ? 0.7 : 1 }}
+                style={{ 
+                  opacity: loading ? 0.7 : 1,
+                  paddingRight: '40px'
+                }}
               />
+              {/* 👁️ Icône œil pour confirmation */}
+              <span 
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  cursor: 'pointer',
+                  fontSize: '20px',
+                  userSelect: 'none',
+                  opacity: 0.6,
+                  transition: 'opacity 0.2s',
+                  zIndex: 2
+                }}
+                onMouseEnter={(e) => e.target.style.opacity = 1}
+                onMouseLeave={(e) => e.target.style.opacity = 0.6}
+              >
+                {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+              </span>
             </div>
           </div>
 
