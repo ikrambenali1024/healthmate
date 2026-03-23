@@ -1,0 +1,106 @@
+const Activity = require('../models/activity');
+
+// Récupérer toutes les activités de l'utilisateur connecté
+exports.getActivities = async (req, res) => {
+  try {
+    const activities = await Activity.find({ user: req.user.id }).sort({ date: -1 });
+    res.json({ success: true, data: activities });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
+  }
+};
+// Créer une nouvelle activité
+exports.createActivity = async (req, res) => {
+  try {
+    const { type, title, description, date, duration, mood, feedback } = req.body;
+
+    if (!type || !title) {
+      return res.status(400).json({ success: false, message: 'type et title sont obligatoires' });
+    }
+
+    const activity = new Activity({
+      user: req.user.id,
+      type,
+      title,
+      description,
+      date: date ? new Date(date) : new Date(),
+      duration,
+      mood,
+      feedback
+    });
+
+    await activity.save();
+    res.status(201).json({ success: true, data: activity });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
+  }
+};
+// Vue globale du tableau de bord
+exports.getDashboard = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Bornes de la semaine en cours
+    const today = new Date();
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - today.getDay() + 1);
+    weekStart.setHours(0, 0, 0, 0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+
+    // Toutes les activités de la semaine
+    const weekActivities = await Activity.find({
+      user: userId,
+      date: { $gte: weekStart, $lte: weekEnd }
+    });
+
+    // Stats globales de la semaine
+    const total = weekActivities.length;
+    const completed = weekActivities.filter(a => a.completed).length;
+    const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    // Avancement jour par jour
+    const jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    const dailyBreakdown = [];
+
+    for (let i = 0; i < 7; i++) {
+      const dayStart = new Date(weekStart);
+      dayStart.setDate(weekStart.getDate() + i);
+      dayStart.setHours(0, 0, 0, 0);
+
+      const dayEnd = new Date(dayStart);
+      dayEnd.setHours(23, 59, 59, 999);
+
+      const dayActivities = weekActivities.filter(a => {
+        const d = new Date(a.date);
+        return d >= dayStart && d <= dayEnd;
+      });
+
+      const dayTotal = dayActivities.length;
+      const dayCompleted = dayActivities.filter(a => a.completed).length;
+
+      dailyBreakdown.push({
+        jour: jours[i],
+        date: dayStart,
+        total: dayTotal,
+        completed: dayCompleted,
+        completionRate: dayTotal > 0 ? Math.round((dayCompleted / dayTotal) * 100) : 0,
+        isToday: dayStart.toDateString() === today.toDateString()
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        weekStats: { total, completed, completionRate },
+        dailyBreakdown,
+        activities: weekActivities
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
+  }
+};

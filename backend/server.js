@@ -2,6 +2,7 @@ const express = require("express");
 require("dotenv").config();
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes"); // 👈 ajouté
 const cors = require("cors");
 
 const app = express();
@@ -20,6 +21,9 @@ connectDB();
 
 // Routes d'authentification
 app.use("/api/auth", authRoutes);
+
+// Routes du tableau de bord
+app.use("/api/dashboard", dashboardRoutes); // 👈 ajouté
 
 // ✅ Route test pour vérifier la connexion frontend/backend
 app.get("/api/test", (req, res) => {
