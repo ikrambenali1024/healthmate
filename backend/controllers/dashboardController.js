@@ -1,6 +1,5 @@
 const Activity = require('../models/activity');
 
-// Récupérer toutes les activités de l'utilisateur connecté
 exports.getActivities = async (req, res) => {
   try {
     const activities = await Activity.find({ user: req.user.id }).sort({ date: -1 });
@@ -9,7 +8,6 @@ exports.getActivities = async (req, res) => {
     res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
   }
 };
-// Créer une nouvelle activité
 exports.createActivity = async (req, res) => {
   try {
     const { type, title, description, date, duration, mood, feedback } = req.body;
@@ -36,12 +34,9 @@ exports.createActivity = async (req, res) => {
     res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
   }
 };
-// Vue globale du tableau de bord
 exports.getDashboard = async (req, res) => {
   try {
     const userId = req.user.id;
-
-    // Bornes de la semaine en cours
     const today = new Date();
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - today.getDay() + 1);
@@ -49,19 +44,13 @@ exports.getDashboard = async (req, res) => {
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
     weekEnd.setHours(23, 59, 59, 999);
-
-    // Toutes les activités de la semaine
     const weekActivities = await Activity.find({
       user: userId,
       date: { $gte: weekStart, $lte: weekEnd }
     });
-
-    // Stats globales de la semaine
     const total = weekActivities.length;
     const completed = weekActivities.filter(a => a.completed).length;
     const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-    // Avancement jour par jour
     const jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
     const dailyBreakdown = [];
 
@@ -99,6 +88,65 @@ exports.getDashboard = async (req, res) => {
         activities: weekActivities
       }
     });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
+  }
+};
+exports.completeActivity = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+    const { completed } = req.body;
+
+    const activity = await Activity.findOne({ _id: id, user: userId });
+    if (!activity) {
+      return res.status(404).json({ success: false, message: 'Activité non trouvée' });
+    }
+
+    activity.completed = completed;
+    activity.completedAt = completed ? new Date() : null;
+
+    await activity.save();
+    res.json({ success: true, data: activity });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
+  }
+};
+exports.updateActivity = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const activity = await Activity.findOne({ _id: id, user: userId });
+    if (!activity) {
+      return res.status(404).json({ success: false, message: 'Activité non trouvée' });
+    }
+
+    const allowedFields = ['title', 'description', 'type', 'duration', 'date', 'completed', 'completedAt', 'mood', 'feedback'];
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) activity[field] = req.body[field];
+    });
+
+    await activity.save();
+    res.json({ success: true, data: activity });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
+  }
+};
+exports.deleteActivity = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const activity = await Activity.findOneAndDelete({ _id: id, user: userId });
+    if (!activity) {
+      return res.status(404).json({ success: false, message: 'Activité non trouvée' });
+    }
+
+    res.json({ success: true, message: 'Activité supprimée avec succès' });
 
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
