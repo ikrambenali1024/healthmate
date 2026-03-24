@@ -56,7 +56,7 @@ function Login() {
       setSuccess("Connexion réussie ! Redirection...");
       
       setTimeout(() => {
-        navigate('/');
+        navigate('/dashboard');
       }, 1500);
 
     } catch (err) {
