@@ -28,7 +28,6 @@ function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(""); 
   
-  // 👁️ États pour afficher/masquer les mots de passe
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -59,67 +58,69 @@ function Register() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError("");
-  setSuccess("");
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess("");
 
-  if (formData.password !== formData.confirmPassword) {
-    setError("Les mots de passe ne correspondent pas");
-    setLoading(false);
-    return;
-  }
+    if (formData.password !== formData.confirmPassword) {
+      setError("Les mots de passe ne correspondent pas");
+      setLoading(false);
+      return;
+    }
 
-  const userData = {
-    firstName: formData.firstName,
-    lastName: formData.lastName,
-    email: formData.email,
-    phone: formData.phone,
-    password: formData.password,
-    birthDate: formData.birthDate,
-    gender: formData.gender,
-    height: formData.height ? parseFloat(formData.height) : null,
-    weight: formData.weight ? parseFloat(formData.weight) : null,
-    goal: formData.goal
+    const userData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      password: formData.password,
+      birthDate: formData.birthDate,
+      gender: formData.gender,
+      height: formData.height ? parseFloat(formData.height) : null,
+      weight: formData.weight ? parseFloat(formData.weight) : null,
+      goal: formData.goal
+    };
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        userData
+      );
+
+      console.log("Réponse du serveur:", response.data);
+      setSuccess("Inscription réussie ! Redirection vers la connexion...");
+      createParticles();
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+
+    } catch (err) {
+      console.error("Erreur d'inscription:", err);
+
+      if (err.response) {
+        setError(err.response.data.message || "Une erreur est survenue");
+      } else if (err.request) {
+        setError("Impossible de contacter le serveur. Vérifie ta connexion.");
+      } else {
+        setError("Une erreur inattendue s'est produite");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  try {
-    const response = await axios.post(
-      "http://localhost:5000/api/auth/register",
-      userData
-    );
-
-    console.log("Réponse du serveur:", response.data);
-
-    setSuccess("Inscription réussie ! Redirection vers la connexion...");
-
-    // 🎉 Effet de célébration
-    createParticles();
-
-    setTimeout(() => {
-      navigate("/login");
-    }, 2000);
-
-  } catch (err) {
-    console.error("Erreur d'inscription:", err);
-
-    if (err.response) {
-      setError(err.response.data.message || "Une erreur est survenue");
-    } else if (err.request) {
-      setError("Impossible de contacter le serveur. Vérifie ta connexion.");
-    } else {
-      setError("Une erreur inattendue s'est produite");
-    }
-  } finally {
-    setLoading(false);
-  }
-};
-
-  
   const carouselItems = [
     'Bien-être', 'Méditation', 'Santé', 'sport', 'Nutrition', 'Forme',
     'Bien-être', 'Méditation', 'Santé', 'sport', 'Nutrition', 'Forme',
     'Bien-être', 'Méditation', 'Santé', 'sport', 'Nutrition', 'Forme'
+  ];
+
+  const goalOptions = [
+    { value: "Perte de poids", icon: "🔥", label: "Perte de poids" },
+    { value: "Gain de poids", icon: "💪", label: "Gain de poids" },
+    { value: "Bien être",     icon: "🌿", label: "Bien être"      },
   ];
 
   return (
@@ -234,20 +235,13 @@ function Register() {
                   required
                   style={{ paddingRight: '40px' }}
                 />
-                {/* 👁️ Icône œil */}
                 <span 
                   onClick={() => setShowPassword(!showPassword)}
                   style={{
-                    position: 'absolute',
-                    right: '10px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    cursor: 'pointer',
-                    fontSize: '20px',
-                    userSelect: 'none',
-                    opacity: 0.6,
-                    transition: 'opacity 0.2s',
-                    zIndex: 2
+                    position: 'absolute', right: '10px', top: '50%',
+                    transform: 'translateY(-50%)', cursor: 'pointer',
+                    fontSize: '20px', userSelect: 'none', opacity: 0.6,
+                    transition: 'opacity 0.2s', zIndex: 2
                   }}
                   onMouseEnter={(e) => e.target.style.opacity = 1}
                   onMouseLeave={(e) => e.target.style.opacity = 0.6}
@@ -273,20 +267,13 @@ function Register() {
                   required
                   style={{ paddingRight: '40px' }}
                 />
-                {/* 👁️ Icône œil pour confirmation */}
                 <span 
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   style={{
-                    position: 'absolute',
-                    right: '10px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    cursor: 'pointer',
-                    fontSize: '20px',
-                    userSelect: 'none',
-                    opacity: 0.6,
-                    transition: 'opacity 0.2s',
-                    zIndex: 2
+                    position: 'absolute', right: '10px', top: '50%',
+                    transform: 'translateY(-50%)', cursor: 'pointer',
+                    fontSize: '20px', userSelect: 'none', opacity: 0.6,
+                    transition: 'opacity 0.2s', zIndex: 2
                   }}
                   onMouseEnter={(e) => e.target.style.opacity = 1}
                   onMouseLeave={(e) => e.target.style.opacity = 0.6}
@@ -360,17 +347,21 @@ function Register() {
             </div>
           </div>
 
+          {/* ── OBJECTIF ── */}
           <div className="form-group">
             <label>Objectif</label>
-            <div className="input-wrapper">
-              <span className="input-icon">🎯</span>
-              <input
-                type="text"
-                name="goal"
-                placeholder="ex : Perte de poids, musculation, bien-être..."
-                value={formData.goal}
-                onChange={handleChange}
-              />
+            <div className="goal-options">
+              {goalOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={`goal-btn ${formData.goal === option.value ? "active" : ""}`}
+                  onClick={() => setFormData(prev => ({ ...prev, goal: option.value }))}
+                >
+                  <span className="goal-icon">{option.icon}</span>
+                  <span>{option.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 

@@ -567,3 +567,45 @@ body {
   .register-grid .full-width { grid-column: span 1; }
   .auth-box::before { left: 26px; right: 26px; }
 }
+/* ─── DATE PLACEHOLDER COLOR ─── */
+.auth-box input[type="date"]:not([value=""]) {
+  color: var(--ink);
+}
+
+.auth-box input[type="date"] {
+  color: rgba(19, 15, 18, .22);
+}
+
+.auth-box input[type="date"]::-webkit-datetime-edit {
+  color: rgba(19, 15, 18, .22);
+}
+
+.auth-box input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  color: rgba(19, 15, 18, .22);
+}
+
+/* Une fois une date sélectionnée → couleur normale */
+.auth-box input[type="date"]:valid {
+  color: var(--ink);
+}
+
+.auth-box input[type="date"]:valid::-webkit-datetime-edit {
+  color: var(--ink);
+}
+
+/* ─── SELECT PLACEHOLDER COLOR ─── */
+.auth-box select {
+  color: rgba(19, 15, 18, .22); /* gris par défaut = "Sélectionne" */
+}
+
+.auth-box select:valid {
+  color: var(--ink); /* noir une fois une option choisie */
+}
+
+.auth-box select option {
+  color: var(--ink); /* les options dans le dropdown en noir */
+}
+
+.auth-box select option[value=""] {
+  color: rgba(19, 15, 18, .22); /* "Sélectionne" reste gris */
+}
