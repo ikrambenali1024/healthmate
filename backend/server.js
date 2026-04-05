@@ -2,7 +2,9 @@ const express = require("express");
 require("dotenv").config();
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
-const dashboardRoutes = require("./routes/dashboardRoutes"); // 👈 ajouté
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const planRoutes = require("./routes/planRoutes");                    // ← NOUVEAU
+const { startWeeklyPlanCron } = require("./cron/weeklyPlan");         // ← NOUVEAU
 const cors = require("cors");
 
 const app = express();
@@ -19,13 +21,21 @@ app.use(express.json());
 // Connexion à la base de données
 connectDB();
 
+// Démarrage du cron après 3 secondes (laisse le temps à MongoDB de se connecter)
+setTimeout(() => {
+  startWeeklyPlanCron();                                                // ← NOUVEAU
+}, 3000);
+
 // Routes d'authentification
 app.use("/api/auth", authRoutes);
 
 // Routes du tableau de bord
-app.use("/api/dashboard", dashboardRoutes); // 👈 ajouté
+app.use("/api/dashboard", dashboardRoutes);
 
-// ✅ Route test pour vérifier la connexion frontend/backend
+// Routes du plan hebdomadaire
+app.use("/api/plan", planRoutes);                                      // ← NOUVEAU
+
+// Route test
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend connecté avec succès ✅" });
 });

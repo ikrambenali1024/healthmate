@@ -1,4 +1,4 @@
-
+// backend/models/activity.js
 const mongoose = require('mongoose');
 
 const activitySchema = new mongoose.Schema({
@@ -18,12 +18,18 @@ const activitySchema = new mongoose.Schema({
     trim: true
   },
   description: { type: String, trim: true },
-  completed: { type: Boolean, default: false },
+  completed:   { type: Boolean, default: false },
   completedAt: { type: Date, default: null },
-  date: { type: Date, required: true, default: Date.now },
-  duration: { type: Number, default: 0 }, // en minutes
-  mood: { type: Number, min: 1, max: 5, default: null },
-  feedback: { type: String, trim: true }
+  date:        { type: Date, required: true, default: Date.now },
+  duration:    { type: Number, default: 0 },      // en minutes
+  mood:        { type: Number, min: 1, max: 5, default: null },
+  feedback:    { type: String, trim: true },
+  source: {
+    type:    String,
+    enum:    ['plan', 'manual'],
+    default: 'manual'
+  }
+
 }, { timestamps: true });
 
 activitySchema.index({ user: 1, date: -1 });
