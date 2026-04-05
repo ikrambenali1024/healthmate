@@ -21,34 +21,125 @@ const TYPE_LABELS = {
   general: "Général"
 };
 
+const PLANS_DATA = {
+  "gain de poids": [
+    { dayOffset: 0, type: "sport",     title: "Musculation haut du corps",     duration: 45 },
+    { dayOffset: 0, type: "nutrition", title: "Repas riche en calories",        duration: 0  },
+    { dayOffset: 1, type: "sport",     title: "Cardio léger 15 min",           duration: 15 },
+    { dayOffset: 1, type: "nutrition", title: "Collation protéinée",           duration: 0  },
+    { dayOffset: 2, type: "sport",     title: "Musculation bas du corps",      duration: 45 },
+    { dayOffset: 2, type: "nutrition", title: "Repas riche en glucides",        duration: 0  },
+    { dayOffset: 3, type: "mental",    title: "Repos actif — étirements",      duration: 20 },
+    { dayOffset: 3, type: "nutrition", title: "3 repas + 2 collations",        duration: 0  },
+    { dayOffset: 4, type: "sport",     title: "Musculation full body",         duration: 50 },
+    { dayOffset: 4, type: "nutrition", title: "Protéines post-séance",         duration: 0  },
+    { dayOffset: 5, type: "sport",     title: "Sport libre ou natation",       duration: 40 },
+    { dayOffset: 5, type: "nutrition", title: "Repas plaisir calorique",       duration: 0  },
+    { dayOffset: 6, type: "mental",    title: "Repos complet",                 duration: 0  },
+    { dayOffset: 6, type: "general",   title: "Bilan poids ",                  duration: 0  },
+  ],
+  "perte de poids": [
+    { dayOffset: 0, type: "sport",     title: "Cardio 30 min",                duration: 30 },
+    { dayOffset: 0, type: "nutrition", title: "Repas faible en calories",     duration: 0  },
+    { dayOffset: 1, type: "sport",     title: "Marche rapide 20 min",         duration: 20 },
+    { dayOffset: 1, type: "nutrition", title: "Boire 2L d'eau",               duration: 0  },
+    { dayOffset: 2, type: "sport",     title: "HIIT 20 min",                  duration: 20 },
+    { dayOffset: 2, type: "nutrition", title: "Protéines et légumes",         duration: 0  },
+    { dayOffset: 3, type: "mental",    title: "Repos actif — étirements",     duration: 15 },
+    { dayOffset: 3, type: "nutrition", title: "Repas équilibré sans sucre",   duration: 0  },
+    { dayOffset: 4, type: "sport",     title: "Cardio 30 min",                duration: 30 },
+    { dayOffset: 4, type: "nutrition", title: "Éviter le sucre et les graisses", duration: 0 },
+    { dayOffset: 5, type: "sport",     title: "Sport libre 45 min",           duration: 45 },
+    { dayOffset: 5, type: "nutrition", title: "Repas plaisir équilibré",      duration: 0  },
+    { dayOffset: 6, type: "mental",    title: "Méditation 10 min",            duration: 10 },
+    { dayOffset: 6, type: "general",   title: "Bilan de la semaine",          duration: 0  },
+  ],
+  "bien-etre": [
+    { dayOffset: 0, type: "mental",    title: "Yoga 20 min",                  duration: 20 },
+    { dayOffset: 0, type: "nutrition", title: "Petit-déjeuner sain et varié", duration: 0  },
+    { dayOffset: 1, type: "mental",    title: "Méditation 15 min",            duration: 15 },
+    { dayOffset: 1, type: "sport",     title: "Marche 30 min en nature",      duration: 30 },
+    { dayOffset: 2, type: "mental",    title: "Journaling — écrire ses pensées", duration: 15 },
+    { dayOffset: 2, type: "nutrition", title: "Repas anti-stress",            duration: 0  },
+    { dayOffset: 3, type: "sport",     title: "Natation ou vélo 30 min",      duration: 30 },
+    { dayOffset: 3, type: "mental",    title: "Lecture 20 min",               duration: 20 },
+    { dayOffset: 4, type: "mental",    title: "Yoga 20 min",                  duration: 20 },
+    { dayOffset: 4, type: "nutrition", title: "Tisane et repas léger",        duration: 0  },
+    { dayOffset: 5, type: "sport",     title: "Activité plaisir libre",       duration: 45 },
+    { dayOffset: 5, type: "mental",    title: "Temps pour soi — déconnexion", duration: 0  },
+    { dayOffset: 6, type: "mental",    title: "Méditation longue 30 min",     duration: 30 },
+    { dayOffset: 6, type: "general",   title: "Bilan bien-être semaine",      duration: 0  },
+  ]
+};
+
+// Génère le plan de la semaine selon l'objectif
+function generateWeekPlan(goalKey, today, currentDayIndex) {
+  const planTemplate = PLANS_DATA[goalKey] || PLANS_DATA['bien-etre'];
+
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - currentDayIndex);
+  weekStart.setHours(0, 0, 0, 0);
+
+  return planTemplate.map((item, i) => {
+    const actDate = new Date(weekStart);
+    actDate.setDate(weekStart.getDate() + item.dayOffset);
+    actDate.setHours(
+      item.type === 'nutrition' ? 12 : item.type === 'mental' ? 9 : 17,
+      0, 0, 0
+    );
+    return {
+      _id: `plan-${item.dayOffset}-${i}`,
+      title: item.title,
+      type: item.type,
+      duration: item.duration,
+      description: '',
+      completed: false,
+      date: actDate.toISOString(),
+      source: 'plan'
+    };
+  });
+}
+
 function Dashboard() {
   const navigate = useNavigate();
 
-  // ✅ FIX 1 — Suppression de l'activité _id:"3"
-  // Elle avait date:hier(=Samedi) + completed:true + source:"manual"
-  // → causait "Samedi 100%" et "1 complétée" invisible dans le Plan
-  const [allActivities, setAllActivities] = useState([
-    {
-      _id: "1",
-      title: "Méditation matinale",
-      type: "mental",
-      duration: 10,
-      description: "Respiration et pleine conscience",
-      completed: false,
-      date: new Date().toISOString(),
-      source: "plan"
-    },
-    {
-      _id: "2",
-      title: "Course à pied",
-      type: "sport",
-      duration: 30,
-      description: "Parcours du parc",
-      completed: false,
-      date: new Date().toISOString(),
-      source: "plan"
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userFullName = user.name || user.firstName || user.username || 'Utilisateur';
+  const userGoal = (user.goal || user.objectif || 'bien-etre').toLowerCase().trim();
+
+  const weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+  const today = new Date();
+  const currentDayIndex = today.getDay() === 0 ? 6 : today.getDay() - 1;
+
+  // Calcul du lundi de la semaine courante (clé unique par semaine)
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - currentDayIndex);
+  weekStart.setHours(0, 0, 0, 0);
+  const weekKey = `plan-${userGoal}-${weekStart.toISOString().split('T')[0]}`;
+
+  // ✅ Initialisation : charge depuis localStorage ou génère automatiquement
+  const [allActivities, setAllActivities] = useState(() => {
+    const saved = localStorage.getItem(weekKey);
+    if (saved) {
+      return JSON.parse(saved);
     }
-  ]);
+    // Nouvelle semaine ou première connexion → générer automatiquement
+    return generateWeekPlan(userGoal, today, currentDayIndex);
+  });
+
+  // ✅ Sauvegarde dans localStorage à chaque changement
+  useEffect(() => {
+    localStorage.setItem(weekKey, JSON.stringify(allActivities));
+  }, [allActivities, weekKey]);
+
+  // ✅ Nettoyage des anciens plans (semaines passées)
+  useEffect(() => {
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('plan-') && key !== weekKey) {
+        localStorage.removeItem(key);
+      }
+    });
+  }, [weekKey]);
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [selectedDayIndex, setSelectedDayIndex] = useState(null);
@@ -61,19 +152,9 @@ function Dashboard() {
   const [newActivity, setNewActivity] = useState({
     type: 'sport', title: '', description: '', duration: ''
   });
-  const [addingToPlan, setAddingToPlan] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const userFullName = user.name || user.firstName || user.username || 'Utilisateur';
-
-  const weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-  const today = new Date();
-  const currentDayIndex = today.getDay() === 0 ? 6 : today.getDay() - 1;
   const displayedDayIndex = selectedDayIndex !== null ? selectedDayIndex : currentDayIndex;
 
-  // ✅ FIX 2 — Ajout du filtre source === 'plan' dans dashboardStats
-  // Avant : comptait toutes les activités (plan + manual)
-  // Après : cohérent avec l'onglet "Mon Plan"
   const dashboardStats = useMemo(() => {
     const activitiesByDay = weekDays.map((_, index) => {
       const dayDate = new Date(today);
@@ -84,7 +165,7 @@ function Dashboard() {
 
       const dayActivities = allActivities.filter(a => {
         const d = new Date(a.date);
-        return d >= dayDate && d <= dayEnd && a.source === 'plan'; // ✅ filtre ajouté
+        return d >= dayDate && d <= dayEnd && a.source === 'plan';
       });
 
       const total = dayActivities.length;
@@ -142,13 +223,12 @@ function Dashboard() {
       description: newActivity.description || '',
       completed: false,
       date: targetDate.toISOString(),
-      source: addingToPlan ? 'plan' : 'manual'
+      source: 'plan'
     };
 
     setAllActivities([...allActivities, newAct]);
     setNewActivity({ type: 'sport', title: '', description: '', duration: '' });
     setShowAddActivity(false);
-    setAddingToPlan(false);
   };
 
   const handleCompleteActivity = (activityId, currentStatus) => {
@@ -163,13 +243,11 @@ function Dashboard() {
 
   const handleRescheduleActivity = () => {
     if (!selectedActivity || !newDate) return;
-
     setAllActivities(allActivities.map(act =>
       act._id === selectedActivity._id
         ? { ...act, date: new Date(newDate).toISOString(), completed: false }
         : act
     ));
-
     setShowRescheduleModal(false);
     setSelectedActivity(null);
     setNewDate('');
@@ -179,22 +257,6 @@ function Dashboard() {
     setSelectedActivity(activity);
     setNewDate(new Date(activity.date).toISOString().split('T')[0]);
     setShowRescheduleModal(true);
-  };
-
-  const handleRegeneratePlan = () => {
-    const newPlanActivities = [
-      {
-        _id: Date.now().toString(),
-        title: "Nouvelle activité générée",
-        type: "general",
-        duration: 15,
-        description: "Activité automatique",
-        completed: false,
-        date: new Date().toISOString(),
-        source: "plan"
-      }
-    ];
-    setAllActivities([...allActivities, ...newPlanActivities]);
   };
 
   const handleDaySelect = (index) => {
@@ -327,17 +389,14 @@ function Dashboard() {
           {/* ========== ONGLET MON PLAN ========== */}
           {activeTab === 'plan' && (
             <div className="plan-section">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div style={{ marginBottom: '1.2rem' }}>
                 <h2 style={{ color: '#000', margin: 0 }}>📅 Mon plan de la semaine</h2>
-                <button onClick={handleRegeneratePlan} style={{
-                  padding: '0.5rem 1.1rem', borderRadius: '999px',
-                  border: '2px solid #E8648A', background: 'transparent',
-                  color: '#E8648A', fontWeight: 600, cursor: 'pointer'
-                }}>
-                  🔄 Regénérer le plan
-                </button>
+                <p style={{ color: '#999', fontSize: '0.8rem', marginTop: '0.3rem' }}>
+                  Objectif : <strong style={{ color: '#E8648A' }}>{userGoal}</strong> — plan généré automatiquement chaque lundi
+                </p>
               </div>
 
+              {/* Sélecteur jours */}
               <div className="weekly-progress" style={{ borderColor: '#E8648A', marginBottom: '1.2rem' }}>
                 <div className="days-container">
                   {weekDays.map((jour, index) => {
@@ -369,8 +428,11 @@ function Dashboard() {
                 </div>
               </div>
 
+              {/* Activités du jour */}
               <div className="activities-list" style={{ borderColor: '#E8648A' }}>
-                <h2 style={{ color: '#000' }}>Plan du <span style={{ color: '#E8648A' }}>{weekDays[displayedDayIndex]}</span></h2>
+                <h2 style={{ color: '#000' }}>
+                  Plan du <span style={{ color: '#E8648A' }}>{weekDays[displayedDayIndex]}</span>
+                </h2>
 
                 {planDayActivities.length === 0 ? (
                   <div className="no-activities">
@@ -403,9 +465,6 @@ function Dashboard() {
                           </div>
                           <div className="activity-details" style={{ marginTop: '0.3rem' }}>
                             {activity.duration > 0 && <span>⏱ {activity.duration} min</span>}
-                            <span style={{ fontSize: '0.7rem', background: '#f5f5f5', color: '#999', borderRadius: '999px', padding: '0.1rem 0.55rem', marginLeft: '0.4rem' }}>
-                              {activity.source === 'plan' ? 'Plan auto' : 'Manuel'}
-                            </span>
                           </div>
                         </div>
                         <div className="activity-status-badge">
@@ -423,16 +482,12 @@ function Dashboard() {
                 )}
 
                 <div className="add-activity-footer" style={{ marginTop: '1rem' }}>
-                  <button onClick={() => { setAddingToPlan(true); setShowAddActivity(true); }}
+                  <button onClick={() => setShowAddActivity(true)}
                     className="add-activity-btn-bottom" style={{ color: '#E8648A' }}>
-                    + Ajouter une activité au plan
+                    + Ajouter une activité
                   </button>
                 </div>
               </div>
-
-              <p style={{ color: '#bbb', fontSize: '0.75rem', textAlign: 'center', marginTop: '1.2rem' }}>
-                📌 Le plan est généré automatiquement chaque <strong>lundi à minuit</strong> selon ton objectif.
-              </p>
             </div>
           )}
         </div>
@@ -440,12 +495,11 @@ function Dashboard() {
 
       {/* MODAL AJOUT */}
       {showAddActivity && (
-        <div className="modal-overlay" onClick={() => { setShowAddActivity(false); setAddingToPlan(false); }}>
+        <div className="modal-overlay" onClick={() => setShowAddActivity(false)}>
           <div className="modal-content" style={{ borderColor: '#E8648A' }} onClick={e => e.stopPropagation()}>
-            <h3 style={{ color: '#000' }}>{addingToPlan ? '📅 Ajouter au plan' : '➕ Ajouter une activité'}</h3>
+            <h3 style={{ color: '#000' }}>➕ Ajouter une activité</h3>
             <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '0.5rem' }}>
               Pour le : {weekDays[displayedDayIndex]}
-              {addingToPlan && <span style={{ marginLeft: '0.5rem', fontSize: '0.7rem', background: '#FFE4EC', color: '#E8648A', borderRadius: '999px', padding: '0.1rem 0.5rem' }}>Plan</span>}
             </p>
             <form onSubmit={handleAddActivity}>
               <select value={newActivity.type} onChange={e => setNewActivity({ ...newActivity, type: e.target.value })} style={{ borderColor: '#E8648A' }} required>
@@ -459,8 +513,8 @@ function Dashboard() {
               <textarea placeholder="Description (optionnel)" value={newActivity.description} onChange={e => setNewActivity({ ...newActivity, description: e.target.value })} style={{ borderColor: '#E8648A' }} />
               <input type="number" placeholder="Durée en minutes (optionnel)" value={newActivity.duration} onChange={e => setNewActivity({ ...newActivity, duration: e.target.value })} style={{ borderColor: '#E8648A' }} />
               <div className="modal-buttons">
-                <button type="submit" style={{ background: '#E8648A', color: 'white' }}>{addingToPlan ? 'Ajouter au plan' : 'Ajouter'}</button>
-                <button type="button" onClick={() => { setShowAddActivity(false); setAddingToPlan(false); }} style={{ borderColor: '#E8648A', color: '#000' }}>Annuler</button>
+                <button type="submit" style={{ background: '#E8648A', color: 'white' }}>Ajouter</button>
+                <button type="button" onClick={() => setShowAddActivity(false)} style={{ borderColor: '#E8648A', color: '#000' }}>Annuler</button>
               </div>
             </form>
           </div>
