@@ -1,4 +1,5 @@
 const Activity = require('../models/activity');
+const User     = require('../models/user');  // ← AJOUTER CETTE LIGNE
 
 exports.getActivities = async (req, res) => {
   try {
@@ -171,6 +172,96 @@ exports.deleteActivity = async (req, res) => {
 
   } catch (error) {
     console.error('Erreur deleteActivity:', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
+  }
+};
+// ══════════════════════════════════════════════
+// GET /api/dashboard/profile
+// Récupérer le profil de l'utilisateur connecté
+// ══════════════════════════════════════════════
+exports.getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password -verificationToken -resetPasswordToken -resetPasswordExpires');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+    }
+    res.json({ success: true, data: user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
+  }
+};
+
+// ══════════════════════════════════════════════
+// PUT /api/dashboard/profile
+// Modifier le profil de l'utilisateur connecté
+// ══════════════════════════════════════════════
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { firstName, lastName, phone, birthDate, gender, height, weight, goal } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+    }
+
+    // Mise à jour uniquement des champs envoyés
+    if (firstName  !== undefined) user.firstName  = firstName;
+    if (lastName   !== undefined) user.lastName   = lastName;
+    if (phone      !== undefined) user.phone      = phone;
+    if (birthDate  !== undefined) user.birthDate  = new Date(birthDate);
+    if (gender     !== undefined) user.gender     = gender;
+    if (height     !== undefined) user.height     = parseFloat(height);
+    if (weight     !== undefined) user.weight     = parseFloat(weight);
+    if (goal       !== undefined) user.goal       = goal;
+
+    await user.save();
+
+    // Retourner le profil sans données sensibles
+    const updated = await User.findById(userId).select('-password -verificationToken -resetPasswordToken -resetPasswordExpires');
+    res.json({ success: true, message: 'Profil mis à jour avec succès', data: updated });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
+  }
+};
+
+// ══════════════════════════════════════════════
+// PUT /api/dashboard/profile/password
+// Changer le mot de passe
+// ══════════════════════════════════════════════
+exports.changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Les deux mots de passe sont requis' });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({ success: false, message: 'Le nouveau mot de passe doit contenir au moins 8 caractères' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+    }
+
+    // Vérifier l'ancien mot de passe
+    const bcrypt = require('bcryptjs');
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: 'Mot de passe actuel incorrect' });
+    }
+
+    // Hasher et sauvegarder le nouveau
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.json({ success: true, message: 'Mot de passe modifié avec succès' });
+
+  } catch (error) {
     res.status(500).json({ success: false, message: 'Erreur serveur', error: error.message });
   }
 };

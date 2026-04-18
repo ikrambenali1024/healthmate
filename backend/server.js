@@ -3,8 +3,11 @@ require("dotenv").config();
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
-const planRoutes = require("./routes/planRoutes");                    // ← NOUVEAU
-const { startWeeklyPlanCron } = require("./cron/weeklyPlan");         // ← NOUVEAU
+const planRoutes = require("./routes/planRoutes");
+const emailRoutes = require('./routes/emailRoutes');          // ← OK
+const chatRoutes = require('./routes/chatRoutes');
+const { startWeeklyPlanCron } = require("./cron/weeklyPlan");
+const { startEmailCron } = require('./cron/emailCron');       // ← OK
 const cors = require("cors");
 
 const app = express();
@@ -21,25 +24,23 @@ app.use(express.json());
 // Connexion à la base de données
 connectDB();
 
-// Démarrage du cron après 3 secondes (laisse le temps à MongoDB de se connecter)
+// Cron — un seul setTimeout suffit
 setTimeout(() => {
-  startWeeklyPlanCron();                                                // ← NOUVEAU
+  startWeeklyPlanCron();
+  startEmailCron();
 }, 3000);
 
-// Routes d'authentification
+// Routes
 app.use("/api/auth", authRoutes);
-
-// Routes du tableau de bord
 app.use("/api/dashboard", dashboardRoutes);
-
-// Routes du plan hebdomadaire
-app.use("/api/plan", planRoutes);                                      // ← NOUVEAU
+app.use("/api/plan", planRoutes);
+app.use("/api/email", emailRoutes);       // ← DÉPLACÉ ICI avec les autres routes
 
 // Route test
 app.get("/api/test", (req, res) => {
   res.json({ message: "Backend connecté avec succès ✅" });
 });
-
+app.use('/api/chat', chatRoutes);
 // Route principale
 app.get("/", (req, res) => res.send("HealthMate backend is running 💚"));
 

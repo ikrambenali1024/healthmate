@@ -8,7 +8,10 @@ const {
   createActivity,
   completeActivity,
   updateActivity,
-  deleteActivity
+  deleteActivity,
+  getProfile,
+  updateProfile,
+  changePassword
 } = require('../controllers/dashboardController');
 
 router.use(protect);
@@ -28,5 +31,11 @@ router.put('/activities/:id/complete', completeActivity);
 router.route('/activities/:id')
   .put(updateActivity)
   .delete(deleteActivity);
+  // ── Profil ─────────────────────────────────────
+router.route('/profile')
+  .get(getProfile)
+  .put(updateProfile);
+
+router.put('/profile/password', changePassword);
 
 module.exports = router;

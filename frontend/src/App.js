@@ -3,8 +3,10 @@ import Home from "./pages/home";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import Dashboard from './pages/dashboard';
-import ForgotPassword from "./pages/forgot-password.jsx";  // ← .jsx en minuscules
-import ResetPassword from "./pages/reset-password.jsx";    // ← .jsx en minuscules
+import ForgotPassword from "./pages/forgot-password.jsx";
+import ResetPassword from "./pages/reset-password.jsx";
+import Profile from './pages/Profile';
+import ChatBot from './components/ChatBot';
 
 function App() {
   return (
@@ -16,7 +18,11 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
+
+      <ChatBot />  {/* ← ICI, après </Routes> mais avant </Router> */}
+
     </Router>
   );
 }
