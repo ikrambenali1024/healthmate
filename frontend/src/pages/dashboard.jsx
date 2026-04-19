@@ -39,7 +39,10 @@ function Dashboard() {
     type: 'sport', title: '', description: '', duration: ''
   });
   const [emailStatus, setEmailStatus] = useState({ loading: '', message: '', error: false });
-  const [showGift, setShowGift] = useState(true);
+  const [showGift, setShowGift] = useState(() => {
+    const flag = sessionStorage.getItem('gift-shown');
+    return !flag;
+  });
 
   const fetchPlan = useCallback(async () => {
     setLoading(true);
@@ -176,6 +179,7 @@ function Dashboard() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('gift-shown');
     navigate('/login');
   };
 
@@ -192,7 +196,10 @@ function Dashboard() {
       <div className="blob blob-b" />
 
       {showGift && (
-        <DailyGift onClose={() => setShowGift(false)} />
+        <DailyGift onClose={() => {
+          sessionStorage.setItem('gift-shown', 'true');
+          setShowGift(false);
+        }} />
       )}
 
       <nav className="dashboard-navbar">
