@@ -6,7 +6,6 @@ import Dashboard from './pages/dashboard';
 import ForgotPassword from "./pages/forgot-password.jsx";
 import ResetPassword from "./pages/reset-password.jsx";
 import Profile from './pages/Profile';
-import ChatBot from './components/ChatBot';
 
 function App() {
   return (
@@ -21,8 +20,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
       </Routes>
 
-      <ChatBot />  {/* ← ICI, après </Routes> mais avant </Router> */}
-
+  
     </Router>
   );
 }

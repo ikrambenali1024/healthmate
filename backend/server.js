@@ -4,10 +4,12 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const planRoutes = require("./routes/planRoutes");
-const emailRoutes = require('./routes/emailRoutes');          // ← OK
+const emailRoutes = require('./routes/emailRoutes');
+          
 const chatRoutes = require('./routes/chatRoutes');
+
 const { startWeeklyPlanCron } = require("./cron/weeklyPlan");
-const { startEmailCron } = require('./cron/emailCron');       // ← OK
+const { startEmailCron } = require('./cron/emailCron');       
 const cors = require("cors");
 
 const app = express();
@@ -34,7 +36,7 @@ setTimeout(() => {
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/plan", planRoutes);
-app.use("/api/email", emailRoutes);       // ← DÉPLACÉ ICI avec les autres routes
+app.use("/api/email", emailRoutes);       
 
 // Route test
 app.get("/api/test", (req, res) => {

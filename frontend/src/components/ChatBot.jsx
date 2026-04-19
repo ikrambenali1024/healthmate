@@ -56,6 +56,7 @@ export default function ChatBot() {
     }
     setLoading(false);
   };
+
    const clearChat = () => {
     setMessages([{
     role: 'assistant',
@@ -111,6 +112,7 @@ export default function ChatBot() {
       <div style={{ fontSize: '11px', opacity: 0.8 }}>Ton assistant bien-être mental</div>
     </div>
     <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
+    
       {/* ← BOUTON EFFACER */}
       <button
         onClick={clearChat}

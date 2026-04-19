@@ -5,5 +5,4 @@ const { chat } = require('../controllers/chatController');
 
 router.use(protect);
 router.post('/', chat);
-
 module.exports = router;

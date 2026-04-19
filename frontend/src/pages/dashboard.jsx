@@ -4,6 +4,7 @@ import "../styles/dashboard.css";
 import "../styles/animation.css";
 import "../styles/components.css";
 import DailyGift from '../components/DailyGift';
+import ChatBot from '../components/ChatBot';
 
 const API = 'http://localhost:5000/api';
 
@@ -24,7 +25,6 @@ function Dashboard() {
   const today = new Date();
   const currentDayIndex = today.getDay() === 0 ? 6 : today.getDay() - 1;
 
-  // ── Tous les useState ICI, avant tout return conditionnel ──
   const [planByDay, setPlanByDay] = useState(Array(7).fill({ activities: [] }));
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -39,20 +39,14 @@ function Dashboard() {
     type: 'sport', title: '', description: '', duration: ''
   });
   const [emailStatus, setEmailStatus] = useState({ loading: '', message: '', error: false });
-
-  // ← DÉPLACÉ ICI avec les autres useState
-  const [showGift, setShowGift] = useState(() => {
-    const todayStr = new Date().toDateString();
-    const lastSeen = localStorage.getItem('hm-gift-date');
-    return lastSeen !== todayStr;
-  });
-
-  const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+  const [showGift, setShowGift] = useState(true);
 
   const fetchPlan = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/plan`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(`${API}/plan`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+      });
       const data = await res.json();
       if (data.success) setPlanByDay(data.data);
     } catch (err) {
@@ -102,7 +96,10 @@ function Dashboard() {
         a._id === activityId ? { ...a, completed: !currentStatus } : a
       )
     })));
-    await fetch(`${API}/plan/activity/${activityId}/toggle`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } });
+    await fetch(`${API}/plan/activity/${activityId}/toggle`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+    });
   };
 
   const handleDelete = async (activityId) => {
@@ -110,7 +107,10 @@ function Dashboard() {
       ...day,
       activities: day.activities.filter(a => a._id !== activityId)
     })));
-    await fetch(`${API}/plan/activity/${activityId}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } });
+    await fetch(`${API}/plan/activity/${activityId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+    });
   };
 
   const handleAddActivity = async (e) => {
@@ -146,7 +146,10 @@ function Dashboard() {
 
   const handleRegenerate = async () => {
     if (!window.confirm('Régénérer le plan ? Les activités actuelles seront supprimées.')) return;
-    await fetch(`${API}/plan/regenerate`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } });
+    await fetch(`${API}/plan/regenerate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+    });
     await fetchPlan();
   };
 
@@ -176,7 +179,6 @@ function Dashboard() {
     navigate('/login');
   };
 
-  // ← Le return conditionnel APRÈS tous les hooks
   if (loading) return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
       <p style={{ color: '#E8648A', fontSize: '1.2rem' }}>⏳ Chargement du plan...</p>
@@ -190,10 +192,7 @@ function Dashboard() {
       <div className="blob blob-b" />
 
       {showGift && (
-        <DailyGift onClose={() => {
-          localStorage.setItem('hm-gift-date', new Date().toDateString());
-          setShowGift(false);
-        }} />
+        <DailyGift onClose={() => setShowGift(false)} />
       )}
 
       <nav className="dashboard-navbar">
@@ -216,22 +215,23 @@ function Dashboard() {
 
       <div className="dashboard-container">
         <div className="dashboard-box" style={{ '--mouse-x': `${mousePosition.x}px`, '--mouse-y': `${mousePosition.y}px` }}>
+
           <div className="dashboard-header">
-<h1 style={{ color: '#000' }}>
-  Tableau de bord{' '}
-  <span style={{ 
-    fontSize: '1.8rem',
-    display: 'inline-block',
-    animation: 'smileFloat 2s ease-in-out infinite',
-    filter: dashboardStats.weekStats.completionRate === 0 ? 'grayscale(1)' : 'none',
-    transition: 'all 0.5s'
-  }}>
-    {dashboardStats.weekStats.completionRate === 0 && '😢'}
-    {dashboardStats.weekStats.completionRate > 0 && dashboardStats.weekStats.completionRate < 50 && '🙂'}
-    {dashboardStats.weekStats.completionRate >= 50 && dashboardStats.weekStats.completionRate < 80 && '😊'}
-    {dashboardStats.weekStats.completionRate >= 80 && '🥳'}
-  </span>
-</h1>          </div>
+            <h1 style={{ color: '#000' }}>
+              Tableau de bord{' '}
+              <span style={{
+                fontSize: '1.8rem',
+                display: 'inline-block',
+                animation: 'smileFloat 2s ease-in-out infinite',
+                transition: 'all 0.5s'
+              }}>
+                {dashboardStats.weekStats.completionRate === 0 && '😢'}
+                {dashboardStats.weekStats.completionRate > 0 && dashboardStats.weekStats.completionRate < 50 && '🙂'}
+                {dashboardStats.weekStats.completionRate >= 50 && dashboardStats.weekStats.completionRate < 80 && '😊'}
+                {dashboardStats.weekStats.completionRate >= 80 && '🥳'}
+              </span>
+            </h1>
+          </div>
 
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
             {[{ key: 'dashboard', label: '📊 Dashboard' }, { key: 'plan', label: '📅 Mon Plan' }].map(({ key, label }) => (
@@ -292,7 +292,6 @@ function Dashboard() {
                 </div>
               </div>
 
-              {/* FEEDBACK */}
               <div style={{ marginTop: '1.5rem', padding: '1.25rem 1.5rem', border: '1.5px solid #eee', borderRadius: '16px', background: '#fff' }}>
                 <p style={{ fontSize: '14px', fontWeight: 600, color: '#999', margin: '0 0 1rem' }}>Comment s'est passée ta semaine ?</p>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '1.25rem' }}>
@@ -325,7 +324,6 @@ function Dashboard() {
                 )}
               </div>
 
-              {/* TEST EMAILS */}
               <div style={{ marginTop: '1.5rem', padding: '1.2rem 1.5rem', border: '1.5px solid #E8648A', borderRadius: '16px', background: '#FFF9FB' }}>
                 <h3 style={{ color: '#000', margin: '0 0 0.3rem' }}>📧 Tester les emails</h3>
                 <p style={{ color: '#999', fontSize: '0.8rem', marginBottom: '1rem' }}>Emails envoyés avec tes vraies données MongoDB</p>
@@ -467,6 +465,9 @@ function Dashboard() {
           </div>
         </div>
       )}
+
+      <ChatBot />
+
     </div>
   );
 }
